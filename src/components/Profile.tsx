@@ -1,5 +1,5 @@
 import React from "react";
-import img from "../assets/images/official.jpg";
+import Assets from "../assets";
 
 function Profile() {
   return (
@@ -7,7 +7,12 @@ function Profile() {
       <div className="row row-cols-1 gy-4">
         <div className="col profile">
           <a href="#">
-            <img src={img} alt="profilePicture" width="175px" height="175px" />
+            <img
+              src={Assets.images.avatar}
+              alt="profilePicture"
+              width="175px"
+              height="175px"
+            />
           </a>
         </div>
         <div className="col">

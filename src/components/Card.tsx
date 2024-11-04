@@ -1,6 +1,14 @@
 import React from "react";
 
-function Card(props) {
+interface CardProps {
+  platform: {
+    name: string;
+    username: string;
+    url: string;
+  };
+}
+
+const Card: React.FC<CardProps> = (props) => {
   const { name, username, url } = props.platform;
   return (
     <div className="textEffect">
@@ -14,6 +22,6 @@ function Card(props) {
       </p>
     </div>
   );
-}
+};
 
 export default Card;
