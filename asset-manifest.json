@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/connectwm/static/css/main.cd519839.css",
+    "main.js": "/connectwm/static/js/main.b9dd6f75.js",
+    "static/js/787.3b64f49d.chunk.js": "/connectwm/static/js/787.3b64f49d.chunk.js",
+    "static/media/official.jpg": "/connectwm/static/media/official.cd093a293a662cdc22ac.jpg",
+    "index.html": "/connectwm/index.html",
+    "main.cd519839.css.map": "/connectwm/static/css/main.cd519839.css.map",
+    "main.b9dd6f75.js.map": "/connectwm/static/js/main.b9dd6f75.js.map",
+    "787.3b64f49d.chunk.js.map": "/connectwm/static/js/787.3b64f49d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cd519839.css",
+    "static/js/main.b9dd6f75.js"
+  ]
+}
