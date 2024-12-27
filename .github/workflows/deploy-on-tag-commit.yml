@@ -3,7 +3,7 @@ name: Deploy to Netlify on Tag Commit
 on:
   push:
     tags:
-      - 'v\d\.\d\.\d{1,3}(-rc-\d+)?'
+      - 'v*'
 jobs:
   deploy:
     runs-on: ubuntu-latest
