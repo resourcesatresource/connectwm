@@ -14,6 +14,7 @@ const ICONS = {
   twitter: "fab fa-twitter",
   youtube: "fab fa-youtube",
   movies: "fas fa-video",
+  link: "fas fa-link",
 };
 
 export const getIconForPlatform = (url: string) => {
@@ -23,5 +24,5 @@ export const getIconForPlatform = (url: string) => {
     }
   }
 
-  return ICONS.facebook;
+  return ICONS.link;
 };
