@@ -3,29 +3,40 @@ name: Deploy to Netlify on Tag Commit
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Node.js (specify the version your project requires)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.19.0'
+          node-version: "18.19.0"
 
-      # Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Build the project (optional, if you want to build it before deploying)
-      - name: Build the project
-        run: CI='' npm run build  # Adjust this if you need to run a specific build command
-
       - name: Deploy to netlify
         run: curl -X POST ${{ secrets.NETLIFY_BUILD_HOOK }}
+
+      - name: Notify Discord of successful deployment
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "username": "Deployment Bot",
+                 "embeds": [{
+                   "title": "ConnectWM: Deployment Successful",
+                   "description": "New version deployed from tag `${{ github.ref_name }}`.",
+                   "color": 5814783,
+                   "footer": {
+                     "text": "GitHub Actions - Netlify Deploy"
+                   },
+                   "timestamp": "'$(date --utc +%Y-%m-%dT%H:%M:%SZ)'"
+                 }]
+               }' ${{ secrets.DISCORD_WEBHOOK_URL }}
