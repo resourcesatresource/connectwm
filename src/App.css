@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  margin: 24px;
 }
 
 body {
@@ -67,4 +68,7 @@ body {
   background: white;
   color: black;
   border: 2px solid black;
+}
+.textEffect .visit-link {
+  margin-right: 4px;
 }

@@ -1,22 +1,35 @@
 import React from "react";
-import platforms from "../dist/myLinks.json";
-import Card from "./Card";
 
-function CardList() {
-  const list = platforms.map((platform, id) => {
-    return (
-      <div className="col" key={id}>
-        <Card platform={platform} />
-      </div>
-    );
-  });
+import Card from "./Card";
+import { Connection } from "../types";
+import { getIconForPlatform } from "../utils";
+
+interface CardListProps {
+  list: Connection[];
+}
+
+const CardList: React.FC<CardListProps> = ({ list }) => {
   return (
     <div className="container">
       <div className="row row-cols-md-2 row-cols-sm-1 gy-md-2 gy-sm-4">
-        {list}
+        {list.map((item) => {
+          const platformDetails = {
+            name: item.name,
+            username: item.description,
+            url: item.url,
+          };
+
+          getIconForPlatform(platformDetails.url);
+
+          return (
+            <div className="col" key={item._id}>
+              <Card platform={platformDetails}></Card>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
-}
+};
 
 export default CardList;

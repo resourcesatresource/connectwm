@@ -1,5 +1,7 @@
 import React from "react";
 
+import { getIconForPlatform } from "../utils";
+
 interface CardProps {
   platform: {
     name: string;
@@ -8,18 +10,22 @@ interface CardProps {
   };
 }
 
-const Card: React.FC<CardProps> = (props) => {
-  const { name, username, url } = props.platform;
+const Card: React.FC<CardProps> = ({ platform }) => {
+  const { name, username, url } = platform;
+
   return (
     <div className="textEffect">
       <p>
-        <i className={`fab fa-${name} icon`}></i>
+        <i className={`${getIconForPlatform(url)} icon`}></i>
       </p>
-      <p>
-        <a href={url} id="youtubeLink">
-          {username}
+      <div>
+        <p>{name}</p>
+        <p>{username}</p>
+        <a href={url}>
+          <strong className="visit-link">Visit</strong>
+          <i className="fas fa-external-link-alt"></i>
         </a>
-      </p>
+      </div>
     </div>
   );
 };
