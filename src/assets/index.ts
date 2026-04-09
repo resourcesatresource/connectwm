@@ -1,5 +1,6 @@
 const avatar = require("./images/official.jpg");
 
 const images = { avatar };
+const Assets = { images };
 
-export default { images };
+export default Assets;

@@ -2,7 +2,6 @@ import React from "react";
 
 import Card from "./Card";
 import { Connection } from "../types";
-import { getIconForPlatform } from "../utils";
 
 interface CardListProps {
   list: Connection[];
@@ -10,8 +9,7 @@ interface CardListProps {
 
 const CardList: React.FC<CardListProps> = ({ list }) => {
   return (
-    <div className="container">
-      <div className="row row-cols-md-2 row-cols-sm-1 gy-md-2 gy-sm-4">
+    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {list.map((item) => {
           const platformDetails = {
             name: item.name,
@@ -19,15 +17,10 @@ const CardList: React.FC<CardListProps> = ({ list }) => {
             url: item.url,
           };
 
-          getIconForPlatform(platformDetails.url);
-
           return (
-            <div className="col" key={item._id}>
-              <Card platform={platformDetails}></Card>
-            </div>
+            <Card key={item._id} platform={platformDetails} />
           );
         })}
-      </div>
     </div>
   );
 };

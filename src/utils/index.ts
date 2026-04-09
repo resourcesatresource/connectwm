@@ -1,28 +1,35 @@
-const supportedPlatformNames = [
-  "facebook",
-  "instagram",
-  "linkedin",
-  "twitter",
-  "youtube",
-  "movies",
+import type { IconSvgElement } from "@hugeicons/core-free-icons";
+import {
+  FacebookIcon,
+  GlobeIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  TwitterIcon,
+  VideoIcon,
+  YoutubeIcon,
+} from "@hugeicons/core-free-icons";
+
+const PLATFORM_META = [
+  { match: "facebook", label: "Facebook", icon: FacebookIcon },
+  { match: "instagram", label: "Instagram", icon: InstagramIcon },
+  { match: "linkedin", label: "LinkedIn", icon: LinkedinIcon },
+  { match: "twitter", label: "Twitter", icon: TwitterIcon },
+  { match: "x.com", label: "X", icon: TwitterIcon },
+  { match: "youtube", label: "YouTube", icon: YoutubeIcon },
+  { match: "movies", label: "Movies", icon: VideoIcon },
 ];
 
-const ICONS = {
-  facebook: "fab fa-facebook",
-  instagram: "fab fa-instagram",
-  linkedin: "fab fa-linkedin",
-  twitter: "fab fa-twitter",
-  youtube: "fab fa-youtube",
-  movies: "fas fa-video",
-  link: "fas fa-link",
-};
+export const getPlatformMeta = (
+  url: string,
+  fallbackName?: string
+): { icon: IconSvgElement; label: string } => {
+  const normalizedUrl = url.toLowerCase();
 
-export const getIconForPlatform = (url: string) => {
-  for (const platformName of supportedPlatformNames) {
-    if (url.includes(platformName)) {
-      return ICONS[platformName as keyof typeof ICONS];
+  for (const platform of PLATFORM_META) {
+    if (normalizedUrl.includes(platform.match)) {
+      return { icon: platform.icon, label: platform.label };
     }
   }
 
-  return ICONS.link;
+  return { icon: GlobeIcon, label: fallbackName || "Website" };
 };

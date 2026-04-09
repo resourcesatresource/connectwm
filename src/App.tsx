@@ -1,45 +1,17 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
 import "./App.css";
-import CardList from "./components/CardList";
-import { API } from "./configs/index";
-import { Connection, CustomerDetails } from "./types";
-import { useEffect, useState } from "react";
 
 function App() {
-  const [customerId, setCustomerId] = useState("");
-  const [connectionList, setConnectionList] = useState<Connection[]>([]);
-
-  const fetchConnections = async (id: string) => {
-    fetch(`${API.BE.PROD}${id}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data: CustomerDetails[]) => {
-        setConnectionList(data?.[0]?.connections ?? []);
-      })
-      .catch((error) => console.error(error));
-  };
-
-  useEffect(() => {
-    const id = window.location.pathname;
-    if (id?.length < 2) {
-      setCustomerId("/679c9f686c20cfe813435e8b");
-    } else {
-      setCustomerId(id);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (customerId) {
-      fetchConnections(customerId);
-    }
-  }, [customerId]);
-
   return (
     <div className="App">
-      <CardList list={connectionList} />
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/:customerId" element={<Home />} />
+          {/* We can add more routes here as we grow */}
+        </Routes>
+      </Router>
     </div>
   );
 }
