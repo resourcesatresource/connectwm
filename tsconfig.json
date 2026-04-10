@@ -15,7 +15,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "paths": {
+      "@hugeicons/core-free-icons": ["../node_modules/@hugeicons/core-free-icons/dist/types/index.d.ts"]
+    }
   },
   "include": ["src"]
 }
