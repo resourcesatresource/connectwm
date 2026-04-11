@@ -8,6 +8,9 @@ import { ThemeProvider } from "./components/theme-provider";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Toaster } from "sonner";
 import "./App.css";
+import ScrollToTop from "./components/ScrollToTop";
+
+
 
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -21,6 +24,7 @@ function App() {
       <AuthProvider>
         <div className="App">
           <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -38,6 +42,7 @@ function App() {
           </Router>
         </div>
         <Toaster richColors position="top-center" />
+
       </AuthProvider>
     </ThemeProvider>
 
@@ -45,4 +50,3 @@ function App() {
 }
 
 export default App;
-

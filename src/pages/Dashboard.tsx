@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { PlusSignIcon, RefreshIcon } from "@hugeicons/core-free-icons";
+import { PlusSignIcon, RefreshIcon, SparklesIcon } from "@hugeicons/core-free-icons";
+
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import Header from "../components/layout/Header";
 import DashboardCard from "../components/DashboardCard";
+import DashboardStats from "../components/DashboardStats";
+import ShareProfileCard from "../components/ShareProfileCard";
+import AddLinkDrawer from "../components/AddLinkDrawer";
+
+
+
 import { useAuth } from "../context/AuthContext";
 import { API } from "../configs";
 import { Connection, CustomerDetails } from "../types";
@@ -11,6 +18,17 @@ import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../components/ui/alert-dialog";
+
 
 import { Card, CardContent } from "../components/ui/card";
 import {
@@ -24,10 +42,14 @@ import {
 import { Skeleton } from "../components/ui/skeleton";
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [linkToDelete, setLinkToDelete] = useState<string | null>(null);
+
 
   const fetchDashboardData = async () => {
     if (!user?._id) return;
@@ -53,9 +75,48 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleDeleteClick = (id: string) => {
+    setLinkToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!linkToDelete || !token) return;
+
+    try {
+      const response = await fetch(
+        `${API.BE.CUSTOMERS.PROD}/connections/${linkToDelete}`,
+        {
+          method: "DELETE",
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to delete link.");
+      }
+
+      toast.success("Link deleted successfully", {
+        description: "The connection has been removed from your profile.",
+      });
+      fetchDashboardData();
+    } catch (err) {
+      toast.error("Error deleting link", {
+        description: err instanceof Error ? err.message : "Something went wrong.",
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setLinkToDelete(null);
+    }
+  };
+
   useEffect(() => {
     fetchDashboardData();
   }, [user?._id]);
+
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background px-4 py-6 sm:px-6 lg:px-8">
@@ -67,8 +128,41 @@ const Dashboard: React.FC = () => {
         <Header />
 
         <div className="flex flex-col gap-8">
+          {/* Analytics Section */}
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 shadow-sm sm:px-6">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <HugeiconsIcon icon={SparklesIcon} size={16} strokeWidth={2} />
+              </div>
+              <p className="text-sm font-medium text-foreground sm:text-base">
+                <span className="font-bold text-primary">Coming Soon:</span> Custom username support is on the way! ✨
+              </p>
+            </div>
+
+            {isLoading ? (
+              <>
+                <Skeleton className="h-28 w-full rounded-3xl" />
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-32 rounded-3xl" />
+                  ))}
+                </div>
+
+              </>
+
+            ) : connections.length > 0 && user ? (
+              <>
+                <ShareProfileCard customerId={user._id} />
+                <DashboardStats connections={connections} />
+              </>
+            ) : null}
+
+
+          </div>
+
           <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="flex flex-col gap-1">
+
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                   Management Dashboard
@@ -99,9 +193,7 @@ const Dashboard: React.FC = () => {
               </Button>
               <Button 
                 className="rounded-2xl shadow-lg shadow-primary/20"
-                onClick={() => toast.info("Add Link feature is coming soon!", {
-                  description: "We're currently building the creation flow."
-                })}
+                onClick={() => setIsAddDrawerOpen(true)}
               >
                 <HugeiconsIcon
                   icon={PlusSignIcon}
@@ -159,8 +251,9 @@ const Dashboard: React.FC = () => {
                       url: connection.url,
                     }}
                     onEdit={() => console.log("Edit:", connection._id)}
-                    onDelete={() => console.log("Delete:", connection._id)}
+                    onDelete={() => handleDeleteClick(connection._id)}
                   />
+
                 ))}
               </div>
             ) : (
@@ -178,9 +271,7 @@ const Dashboard: React.FC = () => {
                   <Button 
                     size="lg" 
                     className="rounded-2xl px-8 shadow-xl shadow-primary/20"
-                    onClick={() => toast.info("Add Link feature is coming soon!", {
-                      description: "We're currently building the creation flow."
-                    })}
+                    onClick={() => setIsAddDrawerOpen(true)}
                   >
                     Add My First Link
                   </Button>
@@ -191,9 +282,38 @@ const Dashboard: React.FC = () => {
           </section>
         </div>
       </div>
+
+      <AddLinkDrawer
+        isOpen={isAddDrawerOpen}
+        onClose={() => setIsAddDrawerOpen(false)}
+        onSuccess={fetchDashboardData}
+      />
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="rounded-3xl border-border/70 p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl">Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-muted-foreground">
+              This action cannot be undone. This will permanently delete your link
+              and remove it from your public profile.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 gap-3">
+            <AlertDialogCancel className="h-11 rounded-2xl border-border/70 text-base">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="h-11 rounded-2xl bg-destructive text-base font-semibold text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Link
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
+
   );
 };
 
 export default Dashboard;
-

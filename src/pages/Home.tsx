@@ -1,10 +1,12 @@
 import { Link, Navigate } from "react-router-dom";
 import {
   ArrowRight01Icon,
+  GithubIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import Header from "../components/layout/Header";
+import DeveloperSection from "../components/DeveloperSection";
 import { useAuth } from "../context/AuthContext";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -137,7 +139,10 @@ function Home() {
             </CardFooter>
           </Card>
         </section>
+
+        <DeveloperSection />
       </div>
+
     </main>
   );
 }

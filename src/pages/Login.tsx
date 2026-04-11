@@ -125,7 +125,7 @@ function Login() {
         <div className="absolute bottom-0 left-1/2 h-96 w-full max-w-5xl -translate-x-1/2 bg-[radial-gradient(circle,_hsl(var(--accent)/0.18),_transparent_68%)]" />
       </div>
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6">
         <Header />
 
         <section className="grid flex-1 items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">

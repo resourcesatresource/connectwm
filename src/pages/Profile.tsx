@@ -5,7 +5,15 @@ import {
   Menu02Icon,
   Moon02Icon,
   Sun03Icon,
+  UserIcon,
+  Link01Icon,
+  RefreshIcon,
+  DashboardSpeed01Icon,
+  EyeIcon,
 } from "@hugeicons/core-free-icons";
+
+
+
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import Assets from "../assets";
@@ -47,9 +55,10 @@ import { Skeleton } from "../components/ui/skeleton";
 
 function Profile() {
   const { theme, setTheme } = useTheme();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const fallbackCustomerId = "679c9f686c20cfe813435e8b";
+
   const { customerId: paramId } = useParams<{ customerId: string }>();
   const [connectionList, setConnectionList] = useState<Connection[]>([]);
   const [customer, setCustomer] = useState<CustomerDetails | null>(null);
@@ -62,8 +71,21 @@ function Profile() {
   };
 
   const scrollToSection = (sectionId: string) => {
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+    const element = document.getElementById(sectionId);
+    if (!element) return;
+
+    const offset = 100; // Offset for header and spacing
+    const bodyRect = document.body.getBoundingClientRect().top;
+    const elementRect = element.getBoundingClientRect().top;
+    const elementPosition = elementRect - bodyRect;
+    const offsetPosition = elementPosition - offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: "smooth",
+    });
   };
+
 
   const fetchConnections = async (id: string) => {
     setIsLoading(true);
@@ -105,7 +127,26 @@ function Profile() {
         <div className="absolute inset-x-0 bottom-0 h-80 bg-[radial-gradient(circle_at_bottom,_hsl(var(--accent)/0.22),_transparent_70%)]" />
       </div>
       <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6">
+        {isAuthenticated && user?._id === (paramId || fallbackCustomerId) && (
+          <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 shadow-sm sm:px-6">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <HugeiconsIcon icon={EyeIcon} size={16} strokeWidth={2} />
+            </div>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2">
+              <p className="text-sm font-medium text-foreground">
+                <span className="font-bold text-primary">Public View:</span> This is how others see your profile.
+              </p>
+              <Link 
+                to="/dashboard" 
+                className="text-xs font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                Back to Dashboard
+              </Link>
+            </div>
+          </div>
+        )}
         <header className="flex items-center justify-between gap-3 rounded-full border border-border/70 bg-background/80 px-3 py-2 shadow-sm backdrop-blur sm:px-4">
+
           <BrandMark subtitle="Connect With Me in one shareable link" />
 
           <div className="flex items-center gap-2">
@@ -134,40 +175,50 @@ function Profile() {
                   Menu
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Quick actions</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onSelect={() => scrollToSection("profile-overview")}>
-                    Profile overview
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => scrollToSection("social-links")}>
-                    Social links
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => fetchConnections(paramId || fallbackCustomerId)}
-                  >
-                    Refresh profile
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                {isAuthenticated && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard">Dashboard</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onSelect={handleLogout}
-                        className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                      >
-                        <HugeiconsIcon icon={Logout01Icon} data-icon="inline-start" strokeWidth={1.8} />
-                        Logout
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </>
-                )}
-              </DropdownMenuContent>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
+                    Quick actions
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onSelect={() => scrollToSection("profile-overview")}>
+                      <HugeiconsIcon icon={UserIcon} size={16} className="mr-2.5" strokeWidth={1.8} />
+                      Profile overview
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => scrollToSection("social-links")}>
+                      <HugeiconsIcon icon={Link01Icon} size={16} className="mr-2.5" strokeWidth={1.8} />
+                      Social links
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => fetchConnections(paramId || fallbackCustomerId)}
+                    >
+                      <HugeiconsIcon icon={RefreshIcon} size={16} className="mr-2.5" strokeWidth={1.8} />
+                      Refresh profile
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  {isAuthenticated && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard">
+                            <HugeiconsIcon icon={DashboardSpeed01Icon} size={16} className="mr-2.5" strokeWidth={1.8} />
+                            Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onSelect={handleLogout}
+                          className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                        >
+                          <HugeiconsIcon icon={Logout01Icon} size={16} className="mr-2.5" strokeWidth={1.8} />
+                          Logout
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </>
+                  )}
+
+                </DropdownMenuContent>
+
             </DropdownMenu>
           </div>
         </header>
@@ -178,17 +229,21 @@ function Profile() {
         >
           <CardContent className="grid gap-8 p-6 md:grid-cols-[220px_minmax(0,1fr)] md:p-8">
             <div className="relative mx-auto flex w-full max-w-[220px] items-center justify-center">
-              <div className="absolute inset-3 rounded-full bg-[radial-gradient(circle,_hsl(var(--primary)/0.24),_transparent_70%)] blur-2xl" />
-              <Avatar className="relative h-40 w-40 rounded-[2rem] shadow-2xl ring-4 ring-background/80 sm:h-48 sm:w-48">
-                <AvatarImage
-                  src={Assets.images.avatar}
-                  alt={customer?.name || "Profile avatar"}
-                  className="object-cover"
-                />
-                <AvatarFallback className="rounded-[2rem] text-3xl font-semibold">
-                  {(customer?.name || "Connect profile").slice(0, 1)}
+              <div className="absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(circle_at_center,_hsl(var(--primary)),_transparent_70%)] opacity-20 blur-3xl animate-pulse" />
+              <Avatar className="relative h-44 w-44 rounded-[2.5rem] shadow-2xl ring-1 ring-border/50 sm:h-52 sm:w-52 overflow-hidden border-4 border-background/50 backdrop-blur-xl">
+                <AvatarFallback className="flex h-full w-full items-center justify-center rounded-[2.5rem] bg-gradient-to-br from-primary via-primary/80 to-accent text-5xl font-bold text-primary-foreground shadow-inner">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_white/20,_transparent_40%)]" />
+                  {isLoading ? (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-foreground/20 border-t-primary-foreground" />
+                    </div>
+                  ) : (
+                    (customer?.name || "Connect").slice(0, 1).toUpperCase()
+                  )}
                 </AvatarFallback>
+
               </Avatar>
+
             </div>
             <div className="flex flex-col justify-center gap-5">
               <div className="flex flex-wrap items-center gap-3">

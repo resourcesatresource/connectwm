@@ -29,7 +29,7 @@ const Header: React.FC = () => {
   return (
     <header className="flex items-center justify-between gap-3 rounded-full border border-border/70 bg-background/80 px-3 py-2 shadow-sm backdrop-blur sm:px-4">
       <div className="flex items-center gap-2">
-        {!isHome && (
+        {!isHome && !isAuthenticated && (
           <Button asChild variant="ghost" className="rounded-full px-3">
             <Link to="/">
               <HugeiconsIcon
