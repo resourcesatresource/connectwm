@@ -1,16 +1,13 @@
 import { type ChangeEvent, type FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import {
-  ArrowLeft01Icon,
-  Moon02Icon,
-  Sun03Icon,
   UserAdd01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import BrandMark from "../components/BrandMark";
+import Header from "../components/layout/Header";
+import { useAuth } from "../context/AuthContext";
 import { API } from "../configs";
-import { useTheme } from "../components/theme-provider";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -46,13 +43,18 @@ const initialValues: SignupValues = {
   password: "",
 };
 
-function Users() {
-  const { theme, setTheme } = useTheme();
+function Register() {
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [values, setValues] = useState<SignupValues>(initialValues);
   const [errors, setErrors] = useState<SignupErrors>({});
   const [formMessage, setFormMessage] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" />;
+  }
 
   const validateForm = () => {
     const nextErrors: SignupErrors = {};
@@ -120,9 +122,15 @@ function Users() {
         );
       }
 
-      setFormMessage("Your account has been created. Next, you can start building the page you want to share.");
-      setValues(initialValues);
-      setErrors({});
+      if (responseData?.token) {
+        const { token, ...user } = responseData;
+        login(token, user);
+        navigate("/dashboard");
+      } else {
+        setFormMessage("Your account has been created. You can now log in.");
+        setValues(initialValues);
+        setErrors({});
+      }
     } catch (error) {
       setFormError(
         error instanceof Error
@@ -142,31 +150,7 @@ function Users() {
       </div>
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6">
-        <header className="flex items-center justify-between gap-3 rounded-full border border-border/70 bg-background/80 px-3 py-2 shadow-sm backdrop-blur sm:px-4">
-          <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" className="rounded-full px-3">
-              <Link to="/">
-                <HugeiconsIcon icon={ArrowLeft01Icon} data-icon="inline-start" strokeWidth={1.8} />
-                Back
-              </Link>
-            </Button>
-            <BrandMark subtitle="Connect With Me in one shareable link" />
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="rounded-full px-4"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            <HugeiconsIcon
-              icon={theme === "dark" ? Sun03Icon : Moon02Icon}
-              data-icon="inline-start"
-              strokeWidth={1.8}
-            />
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </Button>
-        </header>
+        <Header />
 
         <section className="grid flex-1 items-center gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <Card className="border-border/70 bg-card/80">
@@ -323,4 +307,5 @@ function Users() {
   );
 }
 
-export default Users;
+export default Register;
+

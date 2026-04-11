@@ -1,13 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import {
   ArrowRight01Icon,
-  Moon02Icon,
-  Sun03Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import BrandMark from "../components/BrandMark";
-import { useTheme } from "../components/theme-provider";
+import Header from "../components/layout/Header";
+import { useAuth } from "../context/AuthContext";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -20,7 +18,11 @@ import {
 } from "../components/ui/card";
 
 function Home() {
-  const { theme, setTheme } = useTheme();
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" />;
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background px-4 py-6 sm:px-6 lg:px-8">
@@ -29,30 +31,10 @@ function Home() {
         <div className="absolute bottom-0 left-1/2 h-[28rem] w-full max-w-6xl -translate-x-1/2 bg-[radial-gradient(circle,_hsl(var(--accent)/0.18),_transparent_68%)]" />
       </div>
       <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6">
-        <header className="flex items-center justify-between gap-3 rounded-full border border-border/70 bg-background/80 px-3 py-2 shadow-sm backdrop-blur sm:px-4">
-          <BrandMark subtitle="Connect With Me in one shareable link" />
-
-          <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" className="rounded-full px-4">
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-full px-4"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              <HugeiconsIcon
-                icon={theme === "dark" ? Sun03Icon : Moon02Icon}
-                data-icon="inline-start"
-                strokeWidth={1.8}
-              />
-              {theme === "dark" ? "Light mode" : "Dark mode"}
-            </Button>
-          </div>
-        </header>
+        <Header />
 
         <section className="grid flex-1 items-center gap-6 py-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+
           <Card className="overflow-hidden border-border/70 bg-card/80">
             <CardHeader className="flex flex-col gap-4">
               <Badge variant="secondary" className="w-fit rounded-full px-4 py-1.5">
@@ -69,7 +51,7 @@ function Home() {
             <CardContent className="flex flex-col gap-6">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button asChild className="rounded-2xl">
-                  <Link to="/users">
+                  <Link to="/register">
                     Get started
                     <HugeiconsIcon
                       icon={ArrowRight01Icon}

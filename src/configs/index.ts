@@ -12,5 +12,9 @@ export const API = {
       DEV: "http://localhost:3000/api/users",
       PROD: "https://node-api-3m9u.onrender.com/api/users",
     },
+    AUTH: {
+      DEV: "http://localhost:3000/api/auth",
+      PROD: "https://node-api-3m9u.onrender.com/api/auth",
+    },
   },
 };

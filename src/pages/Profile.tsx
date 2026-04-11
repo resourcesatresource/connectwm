@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
+  Logout01Icon,
   Menu02Icon,
   Moon02Icon,
   Sun03Icon,
@@ -13,6 +14,7 @@ import CardList from "../components/CardList";
 import { API } from "../configs";
 import { useTheme } from "../components/theme-provider";
 import { Connection, CustomerDetails } from "../types";
+import { useAuth } from "../context/AuthContext";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
@@ -45,12 +47,19 @@ import { Skeleton } from "../components/ui/skeleton";
 
 function Profile() {
   const { theme, setTheme } = useTheme();
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
   const fallbackCustomerId = "679c9f686c20cfe813435e8b";
   const { customerId: paramId } = useParams<{ customerId: string }>();
   const [connectionList, setConnectionList] = useState<Connection[]>([]);
   const [customer, setCustomer] = useState<CustomerDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   const scrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
@@ -111,7 +120,7 @@ function Profile() {
                 data-icon="inline-start"
                 strokeWidth={1.8}
               />
-              {theme === "dark" ? "Light mode" : "Dark mode"}
+              {theme === "dark" ? "Light" : "Dark"}
             </Button>
 
             <DropdownMenu>
@@ -141,6 +150,23 @@ function Profile() {
                     Refresh profile
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
+                {isAuthenticated && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard">Dashboard</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onSelect={handleLogout}
+                        className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                      >
+                        <HugeiconsIcon icon={Logout01Icon} data-icon="inline-start" strokeWidth={1.8} />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

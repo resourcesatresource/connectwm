@@ -1,13 +1,12 @@
-import { type ChangeEvent, type FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft01Icon, Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { type ChangeEvent, type FormEvent, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import BrandMark from "../components/BrandMark";
-import { useTheme } from "../components/theme-provider";
+import Header from "../components/layout/Header";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { API } from "../configs";
+import { useAuth } from "../context/AuthContext";
 import {
   Card,
   CardContent,
@@ -39,10 +38,19 @@ const initialValues: LoginValues = {
 };
 
 function Login() {
-  const { theme, setTheme } = useTheme();
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [values, setValues] = useState<LoginValues>(initialValues);
   const [errors, setErrors] = useState<LoginErrors>({});
   const [formMessage, setFormMessage] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange =
     (field: keyof LoginValues) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -50,10 +58,13 @@ function Login() {
       setValues((currentValues) => ({ ...currentValues, [field]: nextValue }));
       setErrors((currentErrors) => ({ ...currentErrors, [field]: undefined }));
       setFormMessage(null);
+      setFormError(null);
     };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setFormMessage(null);
+    setFormError(null);
 
     const nextErrors: LoginErrors = {};
 
@@ -71,7 +82,40 @@ function Login() {
       return;
     }
 
-    setFormMessage("Sign-in is being finalized. Your account experience will be available shortly.");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(API.BE.AUTH.PROD, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const responseData = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          responseData?.message || "Invalid email or password. Please try again."
+        );
+      }
+
+      if (responseData?.secureToken && responseData?.user) {
+        login(responseData.secureToken, responseData.user);
+        navigate("/dashboard");
+      } else {
+        throw new Error("Authentication failed. Invalid response structure.");
+      }
+    } catch (error) {
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -82,57 +126,29 @@ function Login() {
       </div>
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6">
-        <header className="flex items-center justify-between gap-3 rounded-full border border-border/70 bg-background/80 px-3 py-2 shadow-sm backdrop-blur sm:px-4">
-          <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" className="rounded-full px-3">
-              <Link to="/">
-                <HugeiconsIcon
-                  icon={ArrowLeft01Icon}
-                  data-icon="inline-start"
-                  strokeWidth={1.8}
-                />
-                Back
-              </Link>
-            </Button>
-            <BrandMark subtitle="Connect With Me in one shareable link" />
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="rounded-full px-4"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            <HugeiconsIcon
-              icon={theme === "dark" ? Sun03Icon : Moon02Icon}
-              data-icon="inline-start"
-              strokeWidth={1.8}
-            />
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </Button>
-        </header>
+        <Header />
 
         <section className="grid flex-1 items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
           <Card className="border-border/70 bg-card/80">
             <CardHeader className="flex flex-col gap-4">
               <Badge variant="secondary" className="w-fit rounded-full px-4 py-1.5">
-                Welcome back
+                Ready to roll
               </Badge>
               <CardTitle className="text-4xl sm:text-5xl">
-                Return to your Connect With Me page
+                Access your Connect With Me dashboard
               </CardTitle>
               <CardDescription className="max-w-xl text-base leading-7 sm:text-lg">
-                Sign in to manage your links, refresh your public profile, and keep your shared page working everywhere you post it.
+                Sign in to customize your links, update your profile, and see how your audience is connecting with you.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <Card className="border-border/70 bg-background/60">
                 <CardContent className="flex flex-col gap-2 p-5">
                   <p className="text-sm font-medium text-foreground">
-                    What you will manage
+                    Complete control
                   </p>
                   <p className="text-sm leading-6 text-muted-foreground">
-                    Update featured destinations, keep your page current, and guide people to the places that matter most.
+                    Everything you need to manage your personal shareable page is right here. Keep your links fresh and your profile updated.
                   </p>
                 </CardContent>
               </Card>
@@ -141,28 +157,28 @@ function Login() {
 
           <Card className="border-border/70 bg-card/90">
             <CardHeader className="flex flex-col gap-3">
-              <CardTitle>Login</CardTitle>
+              <CardTitle>Sign In</CardTitle>
               <CardDescription>
-                Sign in with the email and password connected to your account.
+                Enter your account details to access your dashboard.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                 <FieldGroup>
                   <Field data-invalid={!!errors.email}>
-                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                    <FieldLabel htmlFor="email">Email address</FieldLabel>
                     <FieldContent>
                       <Input
                         id="email"
                         name="email"
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder="alex@example.com"
                         value={values.email}
                         onChange={handleChange("email")}
                         aria-invalid={!!errors.email}
                       />
                       <FieldDescription>
-                        Use the email address associated with your profile.
+                        The email you used during registration.
                       </FieldDescription>
                       <FieldError>{errors.email}</FieldError>
                     </FieldContent>
@@ -175,33 +191,41 @@ function Login() {
                         id="password"
                         name="password"
                         type="password"
-                        placeholder="Your password"
+                        placeholder="••••••••"
                         value={values.password}
                         onChange={handleChange("password")}
                         aria-invalid={!!errors.password}
                       />
                       <FieldDescription>
-                        Secure sign-in is the next step being finalized for launch.
+                        Your secure account password.
                       </FieldDescription>
                       <FieldError>{errors.password}</FieldError>
                     </FieldContent>
                   </Field>
                 </FieldGroup>
 
+                {formError ? (
+                  <Alert variant="destructive">
+                    <AlertTitle>Login Failed</AlertTitle>
+                    <AlertDescription>{formError}</AlertDescription>
+                  </Alert>
+                ) : null}
+
                 {formMessage ? (
                   <Alert>
-                    <AlertTitle>Almost ready</AlertTitle>
+                    <AlertTitle>Success</AlertTitle>
                     <AlertDescription>{formMessage}</AlertDescription>
                   </Alert>
                 ) : null}
 
                 <CardFooter className="flex flex-col items-stretch gap-3 p-0">
-                  <Button type="submit" className="rounded-2xl">
-                    Continue
+                  <Button type="submit" className="rounded-2xl" disabled={isSubmitting}>
+                    {isSubmitting ? "Signing in..." : "Sign In"}
                   </Button>
                   <Button asChild variant="ghost" className="rounded-2xl">
-                    <Link to="/users">Need an account? Sign up</Link>
+                    <Link to="/register">Create a new account</Link>
                   </Button>
+
                 </CardFooter>
               </form>
             </CardContent>

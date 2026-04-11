@@ -1,9 +1,11 @@
 import {
   InformationCircleIcon,
   SquareArrowUpRightIcon,
+  PencilEdit01Icon,
+  Delete02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-
+import { toast } from "sonner";
 
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -17,20 +19,32 @@ import {
 } from "./ui/card";
 import { getPlatformMeta } from "../utils";
 
-interface CardProps {
+interface DashboardCardProps {
   platform: {
     name: string;
     username: string;
     url: string;
   };
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-const Card: React.FC<CardProps> = ({ platform }) => {
+const DashboardCard: React.FC<DashboardCardProps> = ({
+  platform,
+  onEdit,
+  onDelete,
+}) => {
   const { name, username, url } = platform;
   const { icon: Icon, label } = getPlatformMeta(url, name);
 
+  const handleAction = (action: string) => {
+    toast.info(`${action} feature is coming soon!`, {
+      description: "We're working hard to bring this feature to you.",
+    });
+  };
+
   return (
-    <ShadcnCard className="group h-full overflow-hidden border-border/70 bg-card/90 transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl">
+    <ShadcnCard className="group h-full overflow-hidden border-border/70 bg-card/90 transition-all duration-200 hover:shadow-xl">
       <CardHeader className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
@@ -42,7 +56,7 @@ const Card: React.FC<CardProps> = ({ platform }) => {
         </div>
         <div className="flex flex-col gap-1">
           <CardTitle className="text-xl text-foreground">{name}</CardTitle>
-          <CardDescription className="line-clamp-2 text-sm">
+          <CardDescription className="line-clamp-1 text-sm">
             {url.replace(/^https?:\/\//, "")}
           </CardDescription>
         </div>
@@ -63,22 +77,50 @@ const Card: React.FC<CardProps> = ({ platform }) => {
           </p>
         </div>
       </CardContent>
-
-      <CardFooter>
-        <Button asChild className="w-full rounded-2xl">
+      <CardFooter className="flex flex-col gap-3">
+        <div className="grid w-full grid-cols-2 gap-3">
+          <Button
+            variant="outline"
+            className="rounded-2xl border-border/70 hover:bg-primary/10 hover:text-primary"
+            onClick={() => handleAction("Edit")}
+          >
+            <HugeiconsIcon
+              icon={PencilEdit01Icon}
+              data-icon="inline-start"
+              size={16}
+              strokeWidth={1.8}
+            />
+            Edit
+          </Button>
+          <Button
+            variant="outline"
+            className="rounded-2xl border-border/70 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            onClick={() => handleAction("Delete")}
+          >
+            <HugeiconsIcon
+              icon={Delete02Icon}
+              data-icon="inline-start"
+              size={16}
+              strokeWidth={1.8}
+            />
+            Delete
+          </Button>
+        </div>
+        <Button asChild variant="secondary" className="w-full rounded-2xl">
           <a href={url} target="_blank" rel="noreferrer">
-            Open profile
+            View link
             <HugeiconsIcon
               icon={SquareArrowUpRightIcon}
               data-icon="inline-end"
+              size={16}
               strokeWidth={1.8}
             />
           </a>
         </Button>
       </CardFooter>
-
     </ShadcnCard>
   );
 };
 
-export default Card;
+export default DashboardCard;
+
