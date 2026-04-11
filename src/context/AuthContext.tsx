@@ -1,11 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  isAdmin: boolean;
-}
+import { User } from "../types";
 
 interface AuthContextType {
   token: string | null;

@@ -9,9 +9,8 @@ import DashboardStats from "../components/DashboardStats";
 import ShareProfileCard from "../components/ShareProfileCard";
 import AddLinkDrawer from "../components/AddLinkDrawer";
 
-
-
 import { useAuth } from "../context/AuthContext";
+import { useProfile } from "../context/ProfileContext";
 import { API } from "../configs";
 import { Connection, CustomerDetails } from "../types";
 import { toast } from "sonner";
@@ -42,7 +41,8 @@ import {
 import { Skeleton } from "../components/ui/skeleton";
 
 const Dashboard: React.FC = () => {
-  const { user, token } = useAuth();
+  const { token } = useAuth();
+  const { userProfile: user } = useProfile();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -130,15 +130,6 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-col gap-8">
           {/* Analytics Section */}
           <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 shadow-sm sm:px-6">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <HugeiconsIcon icon={SparklesIcon} size={16} strokeWidth={2} />
-              </div>
-              <p className="text-sm font-medium text-foreground sm:text-base">
-                <span className="font-bold text-primary">Coming Soon:</span> Custom username support is on the way! ✨
-              </p>
-            </div>
-
             {isLoading ? (
               <>
                 <Skeleton className="h-28 w-full rounded-3xl" />
@@ -152,7 +143,7 @@ const Dashboard: React.FC = () => {
 
             ) : connections.length > 0 && user ? (
               <>
-                <ShareProfileCard customerId={user._id} />
+                <ShareProfileCard customerId={user._id} username={user.username} />
                 <DashboardStats connections={connections} />
               </>
             ) : null}
@@ -165,7 +156,7 @@ const Dashboard: React.FC = () => {
 
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                  Management Dashboard
+                  {user?.name ? `${user.name}'s Dashboard` : "Management Dashboard"}
                 </h1>
                 <Badge variant="secondary" className="rounded-full px-3">
                   Admin

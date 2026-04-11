@@ -17,7 +17,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import Assets from "../assets";
-import BrandMark from "../components/BrandMark";
+import Header from "../components/layout/Header";
 import CardList from "../components/CardList";
 import { API } from "../configs";
 import { useTheme } from "../components/theme-provider";
@@ -126,102 +126,76 @@ function Profile() {
         <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.18),_transparent_65%)]" />
         <div className="absolute inset-x-0 bottom-0 h-80 bg-[radial-gradient(circle_at_bottom,_hsl(var(--accent)/0.22),_transparent_70%)]" />
       </div>
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6">
-        {isAuthenticated && user?._id === (paramId || fallbackCustomerId) && (
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6 pb-12">
+        {isAuthenticated && (
           <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 shadow-sm sm:px-6">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <HugeiconsIcon icon={EyeIcon} size={16} strokeWidth={2} />
+              <HugeiconsIcon 
+                icon={user?._id === (paramId || customer?._id || fallbackCustomerId) ? EyeIcon : DashboardSpeed01Icon} 
+                size={16} 
+                strokeWidth={2} 
+              />
             </div>
             <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2">
               <p className="text-sm font-medium text-foreground">
-                <span className="font-bold text-primary">Public View:</span> This is how others see your profile.
+                <span className="font-bold text-primary">
+                  {user?._id === (paramId || customer?._id || fallbackCustomerId) ? "Public View:" : "Authenticated:"}
+                </span>{" "}
+                {user?._id === (paramId || customer?._id || fallbackCustomerId) 
+                  ? "This is how others see your profile." 
+                  : `Viewing ${customer?.name || "this"} profile.`}
               </p>
               <Link 
                 to="/dashboard" 
                 className="text-xs font-semibold text-primary underline-offset-4 hover:underline"
               >
-                Back to Dashboard
+                Go to My Dashboard
               </Link>
             </div>
           </div>
         )}
-        <header className="flex items-center justify-between gap-3 rounded-full border border-border/70 bg-background/80 px-3 py-2 shadow-sm backdrop-blur sm:px-4">
-
-          <BrandMark subtitle="Connect With Me in one shareable link" />
-
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-full px-4"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              <HugeiconsIcon
-                icon={theme === "dark" ? Sun03Icon : Moon02Icon}
-                data-icon="inline-start"
-                strokeWidth={1.8}
-              />
-              {theme === "dark" ? "Light" : "Dark"}
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="button" variant="outline" className="rounded-full px-4">
-                  <HugeiconsIcon
-                    icon={Menu02Icon}
-                    data-icon="inline-start"
-                    strokeWidth={1.8}
-                  />
-                  Menu
-                </Button>
-              </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
-                    Quick actions
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem onSelect={() => scrollToSection("profile-overview")}>
-                      <HugeiconsIcon icon={UserIcon} size={16} className="mr-2.5" strokeWidth={1.8} />
-                      Profile overview
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => scrollToSection("social-links")}>
-                      <HugeiconsIcon icon={Link01Icon} size={16} className="mr-2.5" strokeWidth={1.8} />
-                      Social links
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={() => fetchConnections(paramId || fallbackCustomerId)}
-                    >
-                      <HugeiconsIcon icon={RefreshIcon} size={16} className="mr-2.5" strokeWidth={1.8} />
-                      Refresh profile
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  {isAuthenticated && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem asChild>
-                          <Link to="/dashboard">
-                            <HugeiconsIcon icon={DashboardSpeed01Icon} size={16} className="mr-2.5" strokeWidth={1.8} />
-                            Dashboard
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onSelect={handleLogout}
-                          className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                        >
-                          <HugeiconsIcon icon={Logout01Icon} size={16} className="mr-2.5" strokeWidth={1.8} />
-                          Logout
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </>
-                  )}
-
-                </DropdownMenuContent>
-
-            </DropdownMenu>
+        
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex-1">
+            <Header />
           </div>
-        </header>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="outline" className="h-[54px] w-full rounded-full border-border/70 bg-background/80 px-6 shadow-sm backdrop-blur sm:w-auto">
+                <HugeiconsIcon
+                  icon={Menu02Icon}
+                  data-icon="inline-start"
+                  strokeWidth={1.8}
+                />
+                Page Menu
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 mt-2 rounded-2xl border-border/70 shadow-xl">
+              <DropdownMenuLabel className="font-semibold uppercase tracking-wider text-[10px] text-muted-foreground px-3 py-2">
+                Quick actions
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem onSelect={() => scrollToSection("profile-overview")} className="rounded-xl cursor-pointer mx-1">
+                  <HugeiconsIcon icon={UserIcon} size={16} className="mr-2.5" strokeWidth={1.8} />
+                  Profile overview
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => scrollToSection("social-links")} className="rounded-xl cursor-pointer mx-1">
+                  <HugeiconsIcon icon={Link01Icon} size={16} className="mr-2.5" strokeWidth={1.8} />
+                  Social links
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => fetchConnections(paramId || fallbackCustomerId)}
+                  className="rounded-xl cursor-pointer mx-1"
+                >
+                  <HugeiconsIcon icon={RefreshIcon} size={16} className="mr-2.5" strokeWidth={1.8} />
+                  Refresh profile
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <Card
           id="profile-overview"
@@ -345,6 +319,32 @@ function Profile() {
             </Empty>
           )}
         </section>
+
+        <footer className="mt-8 flex flex-col items-center justify-center gap-4 border-t border-border/40 pt-12 text-center">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Powered by</span>
+            <Link to="/" className="flex items-center gap-2 font-bold text-foreground transition-all hover:text-primary">
+              <Avatar className="size-6 rounded-lg">
+                <AvatarImage
+                  src={`${process.env.PUBLIC_URL}/icons/favicon.jpg`}
+                  alt="ConnectWM logo"
+                />
+                <AvatarFallback className="rounded-lg bg-primary text-[8px] text-primary-foreground">
+                  CW
+                </AvatarFallback>
+              </Avatar>
+              ConnectWM
+            </Link>
+          </div>
+          <p className="max-w-xs text-[11px] leading-relaxed text-muted-foreground/60">
+            Create your own professional digital presence in seconds. One link for everything that matters.
+          </p>
+          {!isAuthenticated && (
+            <Button asChild variant="outline" size="sm" className="mt-2 rounded-full border-border/70 text-xs text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all">
+              <Link to="/register">Create My Profile</Link>
+            </Button>
+          )}
+        </footer>
       </div>
     </main>
   );

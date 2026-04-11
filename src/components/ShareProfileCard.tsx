@@ -8,6 +8,7 @@ import { Card, CardContent } from "./ui/card";
 
 interface ShareProfileCardProps {
   customerId: string;
+  username?: string;
 }
 
 const ShareProfileCard: React.FC<ShareProfileCardProps> = ({ customerId }) => {
