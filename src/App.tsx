@@ -5,6 +5,7 @@ import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import MyProfile from "./pages/MyProfile";
+import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "./components/theme-provider";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ProfileProvider } from "./context/ProfileContext";
@@ -46,6 +47,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Router>
           </div>

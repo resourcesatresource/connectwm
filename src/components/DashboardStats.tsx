@@ -222,15 +222,15 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ connections }) => {
                     {weeks.map((week, weekIndex) => (
                       <div key={`week-${weekIndex}`} className="grid grid-rows-7 gap-1.5 shrink-0" style={{ width: '12px' }}>
                         {week.map((day) => (
-                          <Tooltip key={day.dateKey}>
+                          <Tooltip key={day.dateKey} delayDuration={0}>
                             <TooltipTrigger asChild>
-                              <div
+                              <button
+                                type="button"
                                 className={`size-[12px] rounded-[2.5px] transition-colors ${getHeatmapCellClass(
                                   day.value
                                 )}`}
                               />
-                            </TooltipTrigger>
-                            <TooltipContent className="text-[11px] px-2 py-1">
+                            </TooltipTrigger>                            <TooltipContent className="text-[11px] px-2 py-1">
                               <span className="font-semibold">{day.value}</span>
                               {day.value === 1 ? " activity" : " activities"} on{" "}
                               {day.date.toLocaleDateString(undefined, {
