@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { UserIcon, Edit01Icon, AtIcon } from "@hugeicons/core-free-icons";
+import { Edit01Icon, AtIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
 
@@ -23,6 +23,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
 import { API } from "../configs";
+import AvatarUpload from "./AvatarUpload";
 
 interface ProfileEditDrawerProps {
   isOpen: boolean;
@@ -130,8 +131,13 @@ const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({ isOpen, onClose }
       <DrawerContent className="mx-auto max-w-lg rounded-t-[2.5rem] border-border/70 bg-background">
         <div className="flex max-h-[85vh] flex-col overflow-y-auto px-6 py-4 scrollbar-none">
           <DrawerHeader className="px-0 pb-2">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <HugeiconsIcon icon={UserIcon} size={32} strokeWidth={1.5} />
+            <div className="mx-auto mb-4">
+              <AvatarUpload
+                name={userProfile?.name || ""}
+                currentImage={userProfile?.profileImage}
+                avatarClassName="h-20 w-20 rounded-full border-4 border-background shadow-xl"
+                fallbackClassName="bg-primary text-2xl font-bold text-primary-foreground"
+              />
             </div>
             <DrawerTitle className="text-center text-2xl font-bold">Edit Profile</DrawerTitle>
             <DrawerDescription className="text-center text-base">

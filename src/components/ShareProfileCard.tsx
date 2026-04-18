@@ -11,8 +11,8 @@ interface ShareProfileCardProps {
   username?: string;
 }
 
-const ShareProfileCard: React.FC<ShareProfileCardProps> = ({ customerId }) => {
-  const profileUrl = `${window.location.origin}/u/${customerId}`;
+const ShareProfileCard: React.FC<ShareProfileCardProps> = ({ customerId, username }) => {
+  const profileUrl = `${window.location.origin}/u/${username || customerId}`;
 
   const copyToClipboard = async () => {
     try {

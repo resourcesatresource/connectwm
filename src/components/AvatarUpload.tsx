@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { ImageUploadIcon } from "@hugeicons/core-free-icons";
+import { ImageUploadIcon, Camera01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
 
@@ -96,7 +96,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         </AvatarFallback>
       </Avatar>
 
-      {/* overlay */}
+      {/* hover overlay */}
       <div className="absolute inset-0 flex items-center justify-center rounded-[inherit] bg-black/40 opacity-0 transition-opacity hover:opacity-100">
         {isUploading ? (
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -104,6 +104,13 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
           <HugeiconsIcon icon={ImageUploadIcon} size={22} className="text-white" strokeWidth={1.8} />
         )}
       </div>
+
+      {/* always-visible camera badge */}
+      {!isUploading && (
+        <div className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-md">
+          <HugeiconsIcon icon={Camera01Icon} size={13} strokeWidth={2} />
+        </div>
+      )}
 
       <input
         ref={inputRef}

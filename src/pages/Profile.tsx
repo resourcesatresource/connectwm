@@ -4,6 +4,7 @@ import {
   UserIcon,
   Link01Icon,
   RefreshIcon,
+  Share01Icon,
   DashboardSpeed01Icon,
   EyeIcon,
 } from "@hugeicons/core-free-icons";
@@ -104,7 +105,7 @@ function Profile() {
         <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.18),_transparent_65%)]" />
         <div className="absolute inset-x-0 bottom-0 h-80 bg-[radial-gradient(circle_at_bottom,_hsl(var(--accent)/0.22),_transparent_70%)]" />
       </div>
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6 pb-12">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6 pb-28">
         {isAuthenticated && (
           <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 shadow-sm sm:px-6">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -137,32 +138,6 @@ function Profile() {
           <Header />
         </div>
 
-        <nav className="sticky top-4 z-10 flex justify-center">
-          <div className="flex items-center gap-1 rounded-full border border-border/70 bg-background/80 px-2 py-1.5 shadow-sm backdrop-blur">
-            <button
-              onClick={() => scrollToSection("profile-overview")}
-              className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <HugeiconsIcon icon={UserIcon} size={14} strokeWidth={2} />
-              Profile
-            </button>
-            <button
-              onClick={() => scrollToSection("social-links")}
-              className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <HugeiconsIcon icon={Link01Icon} size={14} strokeWidth={2} />
-              Links
-            </button>
-            <button
-              onClick={() => fetchConnections(paramId || fallbackCustomerId)}
-              className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <HugeiconsIcon icon={RefreshIcon} size={14} strokeWidth={2} />
-              Refresh
-            </button>
-          </div>
-        </nav>
-
         <Card
           id="profile-overview"
           className="overflow-hidden border-border/70 bg-card/80"
@@ -170,9 +145,9 @@ function Profile() {
           <CardContent className="grid gap-8 p-6 md:grid-cols-[220px_minmax(0,1fr)] md:p-8">
             <div className="relative mx-auto flex w-full max-w-[220px] items-center justify-center">
               <div className="absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(circle_at_center,_hsl(var(--primary)),_transparent_70%)] opacity-20 blur-3xl animate-pulse" />
-              <Avatar className="relative h-44 w-44 rounded-[2.5rem] shadow-2xl ring-1 ring-border/50 sm:h-52 sm:w-52 overflow-hidden border-4 border-background/50 backdrop-blur-xl">
+              <Avatar className="relative h-44 w-44 rounded-full shadow-2xl ring-1 ring-border/50 sm:h-52 sm:w-52 overflow-hidden border-4 border-background/50 backdrop-blur-xl">
                 <AvatarImage src={customer?.userId?.profileImage} alt={customer?.name} className="object-cover" />
-                <AvatarFallback className="flex h-full w-full items-center justify-center rounded-[2.5rem] bg-gradient-to-br from-primary via-primary/80 to-accent text-5xl font-bold text-primary-foreground shadow-inner">
+                <AvatarFallback className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary via-primary/80 to-accent text-5xl font-bold text-primary-foreground shadow-inner">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_white/20,_transparent_40%)]" />
                   {isLoading ? (
                     <div className="flex h-full w-full items-center justify-center">
@@ -325,6 +300,47 @@ function Profile() {
           )}
         </footer>
       </div>
+
+      {/* Floating bottom tab bar */}
+      <nav className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
+        <div className="flex items-center gap-1 rounded-full border border-border/60 bg-background/90 px-2 py-2 shadow-xl backdrop-blur-md">
+          <button
+            onClick={() => scrollToSection("profile-overview")}
+            className="flex flex-col items-center gap-0.5 rounded-full px-5 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <HugeiconsIcon icon={UserIcon} size={18} strokeWidth={1.8} />
+            <span className="text-[10px] font-medium">Profile</span>
+          </button>
+          <button
+            onClick={() => scrollToSection("social-links")}
+            className="flex flex-col items-center gap-0.5 rounded-full px-5 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <HugeiconsIcon icon={Link01Icon} size={18} strokeWidth={1.8} />
+            <span className="text-[10px] font-medium">Links</span>
+          </button>
+          <button
+            onClick={() => fetchConnections(paramId || fallbackCustomerId)}
+            className="flex flex-col items-center gap-0.5 rounded-full px-5 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <HugeiconsIcon icon={RefreshIcon} size={18} strokeWidth={1.8} />
+            <span className="text-[10px] font-medium">Refresh</span>
+          </button>
+          <button
+            onClick={() => {
+              const url = window.location.href;
+              if (navigator.share) {
+                navigator.share({ title: customer?.name || "Profile", url });
+              } else {
+                navigator.clipboard.writeText(url);
+              }
+            }}
+            className="flex flex-col items-center gap-0.5 rounded-full px-5 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <HugeiconsIcon icon={Share01Icon} size={18} strokeWidth={1.8} />
+            <span className="text-[10px] font-medium">Share</span>
+          </button>
+        </div>
+      </nav>
     </main>
   );
 }

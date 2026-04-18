@@ -6,6 +6,8 @@ import {
   Calendar03Icon,
   Shield01Icon,
   Edit01Icon,
+  Copy01Icon,
+  CheckmarkCircle01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -15,8 +17,60 @@ import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 import ProfileEditDrawer from "../components/ProfileEditDrawer";
 import AvatarUpload from "../components/AvatarUpload";
+
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = React.useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button onClick={copy} className="rounded-md p-1 transition-colors hover:bg-muted hover:text-foreground">
+            <HugeiconsIcon icon={copied ? CheckmarkCircle01Icon : Copy01Icon} size={14} strokeWidth={1.8} className={copied ? "text-green-500" : ""} />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>{copied ? "Copied!" : "Copy"}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function CopyField({ label, value, icon, mono = false }: { label: string; value: string; icon: React.ComponentProps<typeof HugeiconsIcon>["icon"]; mono?: boolean }) {
+  const [copied, setCopied] = React.useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <HugeiconsIcon icon={icon} size={14} />
+        {label}
+      </div>
+      <div className="flex items-center gap-1.5">
+        <p className={`text-base font-medium text-foreground ${mono ? "font-mono text-sm" : ""}`}>{value}</p>
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button onClick={copy} className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                <HugeiconsIcon icon={copied ? CheckmarkCircle01Icon : Copy01Icon} size={14} strokeWidth={1.8} className={copied ? "text-green-500" : ""} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{copied ? "Copied!" : "Copy"}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </div>
+  );
+}
 
 const MyProfile: React.FC = () => {
   const { userProfile: user, isLoading } = useProfile();
@@ -57,7 +111,7 @@ const MyProfile: React.FC = () => {
                 <AvatarUpload
                   name={user.name}
                   currentImage={user.profileImage}
-                  avatarClassName="h-24 w-24 rounded-3xl border-4 border-background shadow-xl sm:h-32 sm:w-32"
+                  avatarClassName="h-24 w-24 rounded-full border-4 border-background shadow-xl sm:h-32 sm:w-32"
                   fallbackClassName="bg-primary text-3xl font-bold text-primary-foreground sm:text-4xl"
                 />
                 
@@ -73,9 +127,10 @@ const MyProfile: React.FC = () => {
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex items-center gap-1 text-muted-foreground">
                       <HugeiconsIcon icon={AtIcon} size={16} />
                       <span className="text-sm font-medium">{user.username || "no-username"}</span>
+                      <CopyButton value={user.username || "no-username"} />
                     </div>
                   </div>
                   
@@ -93,29 +148,9 @@ const MyProfile: React.FC = () => {
             
             <CardContent className="grid gap-8 p-6 sm:p-8">
               <div className="grid gap-6 sm:grid-cols-2">
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    <HugeiconsIcon icon={Mail01Icon} size={14} />
-                    Email Address
-                  </div>
-                  <p className="text-base font-medium text-foreground">{user.email}</p>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    <HugeiconsIcon icon={UserIcon} size={14} />
-                    Display Name
-                  </div>
-                  <p className="text-base font-medium text-foreground">{user.name}</p>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    <HugeiconsIcon icon={Calendar03Icon} size={14} />
-                    Account ID
-                  </div>
-                  <p className="font-mono text-sm font-medium text-foreground">{user._id}</p>
-                </div>
+                <CopyField label="Email Address" value={user.email} icon={Mail01Icon} />
+                <CopyField label="Display Name" value={user.name} icon={UserIcon} />
+                <CopyField label="Account ID" value={user._id} icon={Calendar03Icon} mono />
 
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
