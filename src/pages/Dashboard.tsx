@@ -8,6 +8,7 @@ import DashboardCard from "../components/DashboardCard";
 import DashboardStats from "../components/DashboardStats";
 import ShareProfileCard from "../components/ShareProfileCard";
 import AddLinkDrawer from "../components/AddLinkDrawer";
+import EditLinkDrawer from "../components/EditLinkDrawer";
 
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
@@ -49,6 +50,7 @@ const Dashboard: React.FC = () => {
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [linkToDelete, setLinkToDelete] = useState<string | null>(null);
+  const [connectionToEdit, setConnectionToEdit] = useState<Connection | null>(null);
 
 
   const fetchDashboardData = async () => {
@@ -72,6 +74,37 @@ const Dashboard: React.FC = () => {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleIconChange = async (connectionId: string, iconName: string) => {
+    if (!token) return;
+    try {
+      const response = await fetch(
+        `${API.BE.CUSTOMERS.PROD}/connections/${connectionId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+          body: JSON.stringify({ icon: iconName }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to update icon.");
+      }
+
+      setConnections((prev) =>
+        prev.map((c) => (c._id === connectionId ? { ...c, icon: iconName } : c))
+      );
+      toast.success("Icon updated!");
+    } catch (err) {
+      toast.error("Failed to update icon", {
+        description: err instanceof Error ? err.message : "Something went wrong.",
+      });
     }
   };
 
@@ -240,9 +273,11 @@ const Dashboard: React.FC = () => {
                       name: connection.name,
                       username: connection.description,
                       url: connection.url,
+                      icon: connection.icon,
                     }}
-                    onEdit={() => console.log("Edit:", connection._id)}
+                    onEdit={() => setConnectionToEdit(connection)}
                     onDelete={() => handleDeleteClick(connection._id)}
+                    onIconChange={(iconName) => handleIconChange(connection._id, iconName)}
                   />
 
                 ))}
@@ -278,6 +313,16 @@ const Dashboard: React.FC = () => {
         isOpen={isAddDrawerOpen}
         onClose={() => setIsAddDrawerOpen(false)}
         onSuccess={fetchDashboardData}
+      />
+
+      <EditLinkDrawer
+        connection={connectionToEdit}
+        onClose={() => setConnectionToEdit(null)}
+        onSuccess={(updated) =>
+          setConnections((prev) =>
+            prev.map((c) => (c._id === updated._id ? updated : c))
+          )
+        }
       />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

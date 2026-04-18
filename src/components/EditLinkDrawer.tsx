@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { PlusSignIcon, Loading03Icon } from "@hugeicons/core-free-icons";
+import { Loading03Icon, PencilEdit01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import {
@@ -16,17 +16,18 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { API } from "../configs";
 import { useAuth } from "../context/AuthContext";
+import { Connection } from "../types";
 import { getPlatformMeta, ICON_OPTIONS } from "../utils";
 import IconSelectorTray from "./IconSelectorTray";
 
-interface AddLinkDrawerProps {
-  isOpen: boolean;
+interface EditLinkDrawerProps {
+  connection: Connection | null;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (updated: Connection) => void;
 }
 
-const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
-  isOpen,
+const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
+  connection,
   onClose,
   onSuccess,
 }) => {
@@ -40,6 +41,17 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
     icon: "",
   });
 
+  useEffect(() => {
+    if (connection) {
+      setFormData({
+        name: connection.name,
+        description: connection.description ?? "",
+        url: connection.url,
+        icon: connection.icon ?? "",
+      });
+    }
+  }, [connection]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -47,43 +59,34 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.url) {
-      toast.error("Please fill in the required fields", {
-        description: "Link name and URL are mandatory.",
-      });
-      return;
-    }
+    if (!formData.name || !formData.url || !connection) return;
 
     setIsLoading(true);
-
     try {
-      const payload = formData.icon
-        ? formData
-        : { name: formData.name, description: formData.description, url: formData.url };
-
-      const response = await fetch(`${API.BE.CUSTOMERS.PROD}/connections`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "x-auth-token": token || "",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `${API.BE.CUSTOMERS.PROD}/connections/${connection._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token || "",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to add link");
+        throw new Error(errorData.message || "Failed to update link");
       }
 
-      toast.success("Link added successfully!", {
-        description: `${formData.name} has been added to your profile.`,
+      toast.success("Link updated!", {
+        description: `${formData.name} has been saved.`,
       });
-
-      setFormData({ name: "", description: "", url: "", icon: "" });
-      onSuccess();
+      onSuccess({ ...connection, ...formData });
       onClose();
     } catch (error) {
-      toast.error("Error adding link", {
+      toast.error("Error updating link", {
         description: error instanceof Error ? error.message : "Something went wrong.",
       });
     } finally {
@@ -92,21 +95,15 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
   };
 
   const selectedIconOption = ICON_OPTIONS.find((o) => o.name === formData.icon);
-  const previewIcon = formData.icon
-    ? getPlatformMeta(formData.url, formData.name, formData.icon).icon
-    : formData.url
-    ? getPlatformMeta(formData.url, formData.name).icon
-    : null;
+  const previewIcon = getPlatformMeta(formData.url, formData.name, formData.icon || undefined).icon;
 
   return (
     <>
-      <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Drawer open={!!connection} onOpenChange={(open) => !open && onClose()}>
         <DrawerContent className="mx-auto max-w-2xl px-4 pb-8">
           <DrawerHeader className="text-left sm:text-center">
-            <DrawerTitle className="text-2xl font-bold">Add New Link</DrawerTitle>
-            <DrawerDescription>
-              Enter the details of the social link or website you want to share.
-            </DrawerDescription>
+            <DrawerTitle className="text-2xl font-bold">Edit Link</DrawerTitle>
+            <DrawerDescription>Update the details of your connection.</DrawerDescription>
           </DrawerHeader>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-4">
@@ -118,9 +115,7 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
                 className="flex items-center gap-3 rounded-2xl border border-border/70 bg-background px-4 py-3 text-left transition-colors hover:border-primary/50 hover:bg-primary/5"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                  {previewIcon && (
-                    <HugeiconsIcon icon={previewIcon} size={20} strokeWidth={1.8} />
-                  )}
+                  <HugeiconsIcon icon={previewIcon} size={20} strokeWidth={1.8} />
                 </div>
                 <span className="text-sm text-muted-foreground">
                   {selectedIconOption ? selectedIconOption.label : "Auto-detect or choose manually"}
@@ -129,11 +124,11 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="name" className="text-sm font-medium">
+              <Label htmlFor="edit-name" className="text-sm font-medium">
                 Link Name <span className="text-destructive">*</span>
               </Label>
               <Input
-                id="name"
+                id="edit-name"
                 name="name"
                 placeholder="e.g. My Portfolio, Instagram, GitHub"
                 value={formData.name}
@@ -143,11 +138,11 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="description" className="text-sm font-medium">
+              <Label htmlFor="edit-description" className="text-sm font-medium">
                 Description
               </Label>
               <Input
-                id="description"
+                id="edit-description"
                 name="description"
                 placeholder="A short tagline or description"
                 value={formData.description}
@@ -157,11 +152,11 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="url" className="text-sm font-medium">
+              <Label htmlFor="edit-url" className="text-sm font-medium">
                 Link URL <span className="text-destructive">*</span>
               </Label>
               <Input
-                id="url"
+                id="edit-url"
                 name="url"
                 type="url"
                 placeholder="https://example.com"
@@ -180,12 +175,12 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
                 {isLoading ? (
                   <>
                     <HugeiconsIcon icon={Loading03Icon} className="mr-2 animate-spin" />
-                    Adding Link...
+                    Saving...
                   </>
                 ) : (
                   <>
-                    <HugeiconsIcon icon={PlusSignIcon} className="mr-2" />
-                    Save Link
+                    <HugeiconsIcon icon={PencilEdit01Icon} className="mr-2" />
+                    Save Changes
                   </>
                 )}
               </Button>
@@ -213,4 +208,4 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
   );
 };
 
-export default AddLinkDrawer;
+export default EditLinkDrawer;
