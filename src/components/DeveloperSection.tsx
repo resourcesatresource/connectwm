@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  UserIcon,
   GithubIcon,
   GlobalIcon,
   Briefcase01Icon,
@@ -19,7 +18,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Assets from "../assets";
 
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";

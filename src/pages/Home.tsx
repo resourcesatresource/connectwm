@@ -1,8 +1,5 @@
 import { Link, Navigate } from "react-router-dom";
-import {
-  ArrowRight01Icon,
-  GithubIcon,
-} from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import Header from "../components/layout/Header";

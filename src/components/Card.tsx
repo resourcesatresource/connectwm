@@ -28,7 +28,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ platform }) => {
   const { name, username, url } = platform;
-  const { icon: Icon, label } = getPlatformMeta(url, name);
+  const { icon: Icon } = getPlatformMeta(url, name);
 
   return (
     <ShadcnCard className="group flex h-full flex-col overflow-hidden border-border/70 bg-card/90 transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl">

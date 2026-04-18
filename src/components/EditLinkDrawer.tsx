@@ -71,7 +71,12 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
             "Content-Type": "application/json",
             "x-auth-token": token || "",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            name: formData.name,
+            url: formData.url,
+            ...(formData.description && { description: formData.description }),
+            ...(formData.iconName && { iconName: formData.iconName }),
+          }),
         },
       );
 

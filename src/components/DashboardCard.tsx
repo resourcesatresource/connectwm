@@ -36,7 +36,7 @@ interface DashboardCardProps {
     name: string;
     username: string;
     url: string;
-    icon?: string;
+    iconName?: string;
     updatedAt?: string;
   };
   onEdit?: () => void;
@@ -71,8 +71,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   onDelete,
   onIconChange,
 }) => {
-  const { name, username, url, icon, updatedAt } = platform;
-  const { icon: Icon, label } = getPlatformMeta(url, name, icon);
+  const { name, username, url, iconName, updatedAt } = platform;
+  const { icon: Icon } = getPlatformMeta(url, name, iconName);
   const [isIconTrayOpen, setIsIconTrayOpen] = useState(false);
 
   return (
@@ -208,8 +208,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       <IconSelectorTray
         isOpen={isIconTrayOpen}
         onClose={() => setIsIconTrayOpen(false)}
-        selectedIcon={icon}
-        onSelect={(iconName) => onIconChange?.(iconName)}
+        selectedIcon={iconName}
+        onSelect={(name) => onIconChange?.(name)}
       />
     </>
   );

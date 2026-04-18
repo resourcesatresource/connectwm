@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   PlusSignIcon,
   RefreshIcon,
-  SparklesIcon,
 } from "@hugeicons/core-free-icons";
 
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -57,7 +56,7 @@ const Dashboard: React.FC = () => {
     null,
   );
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     if (!user?._id) return;
 
     setIsLoading(true);
@@ -81,7 +80,7 @@ const Dashboard: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?._id]);
 
   const handleIconChange = async (connectionId: string, iconName: string) => {
     if (!token) return;
@@ -105,7 +104,7 @@ const Dashboard: React.FC = () => {
 
       setConnections((prev) =>
         prev.map((c) =>
-          c._id === connectionId ? { ...c, icon: iconName } : c,
+          c._id === connectionId ? { ...c, iconName } : c,
         ),
       );
       toast.success("Icon updated!");
@@ -158,7 +157,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, [user?._id]);
+  }, [user?._id, fetchDashboardData]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background px-4 py-6 sm:px-6 lg:px-8">
@@ -288,7 +287,7 @@ const Dashboard: React.FC = () => {
                       name: connection.name,
                       username: connection.description,
                       url: connection.url,
-                      icon: connection.iconName,
+                      iconName: connection.iconName,
                       updatedAt: connection.updatedAt,
                     }}
                     onEdit={() => setConnectionToEdit(connection)}

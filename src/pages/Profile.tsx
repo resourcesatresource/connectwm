@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
-  Logout01Icon,
   Menu02Icon,
-  Moon02Icon,
-  Sun03Icon,
   UserIcon,
   Link01Icon,
   RefreshIcon,
@@ -16,11 +13,9 @@ import {
 
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import Assets from "../assets";
 import Header from "../components/layout/Header";
 import CardList from "../components/CardList";
 import { API } from "../configs";
-import { useTheme } from "../components/theme-provider";
 import { Connection, CustomerDetails } from "../types";
 import { useAuth } from "../context/AuthContext";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
@@ -54,9 +49,7 @@ import {
 import { Skeleton } from "../components/ui/skeleton";
 
 function Profile() {
-  const { theme, setTheme } = useTheme();
-  const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const fallbackCustomerId = "679c9f686c20cfe813435e8b";
 
   const { customerId: paramId } = useParams<{ customerId: string }>();
@@ -64,11 +57,6 @@ function Profile() {
   const [customer, setCustomer] = useState<CustomerDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);

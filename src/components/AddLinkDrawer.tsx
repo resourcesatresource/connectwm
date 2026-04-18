@@ -37,7 +37,7 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
     name: "",
     description: "",
     url: "",
-    icon: "",
+    iconName: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,9 +57,12 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
     setIsLoading(true);
 
     try {
-      const payload = formData.icon
-        ? formData
-        : { name: formData.name, description: formData.description, url: formData.url };
+      const payload = {
+        name: formData.name,
+        url: formData.url,
+        ...(formData.description && { description: formData.description }),
+        ...(formData.iconName && { iconName: formData.iconName }),
+      };
 
       const response = await fetch(`${API.BE.CUSTOMERS.PROD}/connections`, {
         method: "PATCH",
@@ -79,31 +82,34 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
         description: `${formData.name} has been added to your profile.`,
       });
 
-      setFormData({ name: "", description: "", url: "", icon: "" });
+      setFormData({ name: "", description: "", url: "", iconName: "" });
       onSuccess();
       onClose();
     } catch (error) {
       toast.error("Error adding link", {
-        description: error instanceof Error ? error.message : "Something went wrong.",
+        description:
+          error instanceof Error ? error.message : "Something went wrong.",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const selectedIconOption = ICON_OPTIONS.find((o) => o.name === formData.icon);
-  const previewIcon = formData.icon
-    ? getPlatformMeta(formData.url, formData.name, formData.icon).icon
+  const selectedIconOption = ICON_OPTIONS.find((o) => o.name === formData.iconName);
+  const previewIcon = formData.iconName
+    ? getPlatformMeta(formData.url, formData.name, formData.iconName).icon
     : formData.url
-    ? getPlatformMeta(formData.url, formData.name).icon
-    : null;
+      ? getPlatformMeta(formData.url, formData.name).icon
+      : null;
 
   return (
     <>
       <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DrawerContent className="mx-auto max-w-2xl px-4 pb-8">
           <DrawerHeader className="text-left sm:text-center">
-            <DrawerTitle className="text-2xl font-bold">Add New Link</DrawerTitle>
+            <DrawerTitle className="text-2xl font-bold">
+              Add New Link
+            </DrawerTitle>
             <DrawerDescription>
               Enter the details of the social link or website you want to share.
             </DrawerDescription>
@@ -119,11 +125,17 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                   {previewIcon && (
-                    <HugeiconsIcon icon={previewIcon} size={20} strokeWidth={1.8} />
+                    <HugeiconsIcon
+                      icon={previewIcon}
+                      size={20}
+                      strokeWidth={1.8}
+                    />
                   )}
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {selectedIconOption ? selectedIconOption.label : "Auto-detect or choose manually"}
+                  {selectedIconOption
+                    ? selectedIconOption.label
+                    : "Auto-detect or choose manually"}
                 </span>
               </button>
             </div>
@@ -179,7 +191,10 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
               >
                 {isLoading ? (
                   <>
-                    <HugeiconsIcon icon={Loading03Icon} className="mr-2 animate-spin" />
+                    <HugeiconsIcon
+                      icon={Loading03Icon}
+                      className="mr-2 animate-spin"
+                    />
                     Adding Link...
                   </>
                 ) : (
@@ -206,8 +221,10 @@ const AddLinkDrawer: React.FC<AddLinkDrawerProps> = ({
       <IconSelectorTray
         isOpen={isIconTrayOpen}
         onClose={() => setIsIconTrayOpen(false)}
-        selectedIcon={formData.icon}
-        onSelect={(iconName) => setFormData((prev) => ({ ...prev, icon: iconName }))}
+        selectedIcon={formData.iconName}
+        onSelect={(name) =>
+          setFormData((prev) => ({ ...prev, iconName: name }))
+        }
       />
     </>
   );
