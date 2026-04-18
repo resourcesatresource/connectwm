@@ -32,6 +32,8 @@ npm start
 ```
 The application will be available at `http://localhost:3000`.
 
+> **API environment:** The app automatically targets the correct backend based on `NODE_ENV`. When running `npm start` (development), all API calls go to `http://localhost:3000/api`. Production builds use the remote API. No configuration changes are needed to switch between environments.
+
 ### Building for Production
 
 To create a production build:

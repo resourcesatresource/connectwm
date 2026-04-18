@@ -38,7 +38,7 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
     name: "",
     description: "",
     url: "",
-    icon: "",
+    iconName: "",
   });
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
         name: connection.name,
         description: connection.description ?? "",
         url: connection.url,
-        icon: connection.icon ?? "",
+        iconName: connection.iconName ?? "",
       });
     }
   }, [connection]);
@@ -66,13 +66,13 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
       const response = await fetch(
         `${API.BE.CUSTOMERS.PROD}/connections/${connection._id}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             "x-auth-token": token || "",
           },
           body: JSON.stringify(formData),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -87,15 +87,22 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
       onClose();
     } catch (error) {
       toast.error("Error updating link", {
-        description: error instanceof Error ? error.message : "Something went wrong.",
+        description:
+          error instanceof Error ? error.message : "Something went wrong.",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const selectedIconOption = ICON_OPTIONS.find((o) => o.name === formData.icon);
-  const previewIcon = getPlatformMeta(formData.url, formData.name, formData.icon || undefined).icon;
+  const selectedIconOption = ICON_OPTIONS.find(
+    (o) => o.name === formData.iconName,
+  );
+  const previewIcon = getPlatformMeta(
+    formData.url,
+    formData.name,
+    formData.iconName || undefined,
+  ).icon;
 
   return (
     <>
@@ -103,7 +110,9 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
         <DrawerContent className="mx-auto max-w-2xl px-4 pb-8">
           <DrawerHeader className="text-left sm:text-center">
             <DrawerTitle className="text-2xl font-bold">Edit Link</DrawerTitle>
-            <DrawerDescription>Update the details of your connection.</DrawerDescription>
+            <DrawerDescription>
+              Update the details of your connection.
+            </DrawerDescription>
           </DrawerHeader>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-4">
@@ -115,10 +124,16 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
                 className="flex items-center gap-3 rounded-2xl border border-border/70 bg-background px-4 py-3 text-left transition-colors hover:border-primary/50 hover:bg-primary/5"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                  <HugeiconsIcon icon={previewIcon} size={20} strokeWidth={1.8} />
+                  <HugeiconsIcon
+                    icon={previewIcon}
+                    size={20}
+                    strokeWidth={1.8}
+                  />
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {selectedIconOption ? selectedIconOption.label : "Auto-detect or choose manually"}
+                  {selectedIconOption
+                    ? selectedIconOption.label
+                    : "Auto-detect or choose manually"}
                 </span>
               </button>
             </div>
@@ -174,7 +189,10 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
               >
                 {isLoading ? (
                   <>
-                    <HugeiconsIcon icon={Loading03Icon} className="mr-2 animate-spin" />
+                    <HugeiconsIcon
+                      icon={Loading03Icon}
+                      className="mr-2 animate-spin"
+                    />
                     Saving...
                   </>
                 ) : (
@@ -201,8 +219,8 @@ const EditLinkDrawer: React.FC<EditLinkDrawerProps> = ({
       <IconSelectorTray
         isOpen={isIconTrayOpen}
         onClose={() => setIsIconTrayOpen(false)}
-        selectedIcon={formData.icon}
-        onSelect={(iconName) => setFormData((prev) => ({ ...prev, icon: iconName }))}
+        selectedIcon={formData.iconName}
+        onSelect={(iconName) => setFormData((prev) => ({ ...prev, iconName }))}
       />
     </>
   );

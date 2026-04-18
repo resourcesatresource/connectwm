@@ -11,7 +11,7 @@ export interface Connection {
   name: string;
   description: string;
   url: string;
-  icon?: string;
+  iconName?: string;
   createdAt: string;
   updatedAt: string;
 }

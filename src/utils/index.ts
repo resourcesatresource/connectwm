@@ -90,6 +90,16 @@ const PLATFORM_META = [
   { match: "movies", label: "Movies", icon: VideoIcon },
 ];
 
+export const getDomain = (url: string): string => {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    // return just the SLD, e.g. "github" from "github.com"
+    return host.split(".")[0];
+  } catch {
+    return url;
+  }
+};
+
 export const getPlatformMeta = (
   url: string,
   fallbackName?: string,

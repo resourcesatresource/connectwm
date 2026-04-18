@@ -6,6 +6,7 @@ import {
   Delete02Icon,
   CopyIcon,
   PencilEdit02Icon,
+  Clock01Icon,
 } from "@hugeicons/core-free-icons";
 
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -21,7 +22,13 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { getPlatformMeta } from "../utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
+import { getPlatformMeta, getDomain } from "../utils";
 import IconSelectorTray from "./IconSelectorTray";
 
 interface DashboardCardProps {
@@ -30,10 +37,32 @@ interface DashboardCardProps {
     username: string;
     url: string;
     icon?: string;
+    updatedAt?: string;
   };
   onEdit?: () => void;
   onDelete?: () => void;
   onIconChange?: (iconName: string) => void;
+}
+
+function formatRelative(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months}mo ago`;
+  return `${Math.floor(months / 12)}y ago`;
+}
+
+function formatFull(dateStr: string): string {
+  return new Date(dateStr).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 }
 
 const DashboardCard: React.FC<DashboardCardProps> = ({
@@ -42,7 +71,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   onDelete,
   onIconChange,
 }) => {
-  const { name, username, url, icon } = platform;
+  const { name, username, url, icon, updatedAt } = platform;
   const { icon: Icon, label } = getPlatformMeta(url, name, icon);
   const [isIconTrayOpen, setIsIconTrayOpen] = useState(false);
 
@@ -65,9 +94,29 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
                   <HugeiconsIcon icon={PencilEdit02Icon} size={11} strokeWidth={2} />
                 </button>
               </div>
-              <Badge variant="outline" className="border-border/70 bg-secondary/40">
-                {label}
-              </Badge>
+              <div className="flex flex-wrap items-center justify-end gap-1.5">
+                <Badge variant="outline" className="border-border/70 bg-secondary/40">
+                  {getDomain(url)}
+                </Badge>
+                {updatedAt && (
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Badge
+                          variant="secondary"
+                          className="cursor-default gap-1 text-[10px] font-normal text-muted-foreground"
+                        >
+                          <HugeiconsIcon icon={Clock01Icon} size={10} strokeWidth={2} />
+                          {formatRelative(updatedAt)}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Updated {formatFull(updatedAt)}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
             </div>
             <div className="flex flex-col gap-1">
               <CardTitle className="text-xl text-foreground">{name}</CardTitle>

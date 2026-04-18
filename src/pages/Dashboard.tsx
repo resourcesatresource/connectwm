@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { PlusSignIcon, RefreshIcon, SparklesIcon } from "@hugeicons/core-free-icons";
+import {
+  PlusSignIcon,
+  RefreshIcon,
+  SparklesIcon,
+} from "@hugeicons/core-free-icons";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -29,7 +33,6 @@ import {
   AlertDialogTitle,
 } from "../components/ui/alert-dialog";
 
-
 import { Card, CardContent } from "../components/ui/card";
 import {
   Empty,
@@ -50,8 +53,9 @@ const Dashboard: React.FC = () => {
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [linkToDelete, setLinkToDelete] = useState<string | null>(null);
-  const [connectionToEdit, setConnectionToEdit] = useState<Connection | null>(null);
-
+  const [connectionToEdit, setConnectionToEdit] = useState<Connection | null>(
+    null,
+  );
 
   const fetchDashboardData = async () => {
     if (!user?._id) return;
@@ -61,7 +65,7 @@ const Dashboard: React.FC = () => {
 
     try {
       const response = await fetch(`${API.BE.CUSTOMERS.PROD}/${user._id}`);
-      
+
       if (!response.ok) {
         throw new Error("Unable to load your links. Please try again later.");
       }
@@ -71,7 +75,9 @@ const Dashboard: React.FC = () => {
 
       setConnections(customerDetails?.connections || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred.");
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -83,13 +89,13 @@ const Dashboard: React.FC = () => {
       const response = await fetch(
         `${API.BE.CUSTOMERS.PROD}/connections/${connectionId}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             "x-auth-token": token,
           },
-          body: JSON.stringify({ icon: iconName }),
-        }
+          body: JSON.stringify({ iconName: iconName }),
+        },
       );
 
       if (!response.ok) {
@@ -98,12 +104,15 @@ const Dashboard: React.FC = () => {
       }
 
       setConnections((prev) =>
-        prev.map((c) => (c._id === connectionId ? { ...c, icon: iconName } : c))
+        prev.map((c) =>
+          c._id === connectionId ? { ...c, icon: iconName } : c,
+        ),
       );
       toast.success("Icon updated!");
     } catch (err) {
       toast.error("Failed to update icon", {
-        description: err instanceof Error ? err.message : "Something went wrong.",
+        description:
+          err instanceof Error ? err.message : "Something went wrong.",
       });
     }
   };
@@ -124,7 +133,7 @@ const Dashboard: React.FC = () => {
           headers: {
             "x-auth-token": token,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -138,7 +147,8 @@ const Dashboard: React.FC = () => {
       fetchDashboardData();
     } catch (err) {
       toast.error("Error deleting link", {
-        description: err instanceof Error ? err.message : "Something went wrong.",
+        description:
+          err instanceof Error ? err.message : "Something went wrong.",
       });
     } finally {
       setIsDeleteDialogOpen(false);
@@ -149,7 +159,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     fetchDashboardData();
   }, [user?._id]);
-
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background px-4 py-6 sm:px-6 lg:px-8">
@@ -171,25 +180,25 @@ const Dashboard: React.FC = () => {
                     <Skeleton key={i} className="h-32 rounded-3xl" />
                   ))}
                 </div>
-
               </>
-
             ) : connections.length > 0 && user ? (
               <>
-                <ShareProfileCard customerId={user._id} username={user.username} />
+                <ShareProfileCard
+                  customerId={user._id}
+                  username={user.username}
+                />
                 <DashboardStats connections={connections} />
               </>
             ) : null}
-
-
           </div>
 
           <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="flex flex-col gap-1">
-
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                  {user?.name ? `${user.name}'s Dashboard` : "Management Dashboard"}
+                  {user?.name
+                    ? `${user.name}'s Dashboard`
+                    : "Management Dashboard"}
                 </h1>
                 <Badge variant="secondary" className="rounded-full px-3">
                   Admin
@@ -199,7 +208,7 @@ const Dashboard: React.FC = () => {
                 Manage your shareable links and digital presence.
               </p>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
@@ -215,7 +224,7 @@ const Dashboard: React.FC = () => {
                   className={isLoading ? "animate-spin" : ""}
                 />
               </Button>
-              <Button 
+              <Button
                 className="rounded-2xl shadow-lg shadow-primary/20"
                 onClick={() => setIsAddDrawerOpen(true)}
               >
@@ -234,7 +243,10 @@ const Dashboard: React.FC = () => {
             {isLoading ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3].map((i) => (
-                  <Card key={i} className="overflow-hidden border-border/70 bg-card/80">
+                  <Card
+                    key={i}
+                    className="overflow-hidden border-border/70 bg-card/80"
+                  >
                     <CardContent className="flex flex-col gap-5 p-6">
                       <Skeleton className="h-14 w-14 rounded-2xl" />
                       <div className="flex flex-col gap-3">
@@ -251,7 +263,10 @@ const Dashboard: React.FC = () => {
                 ))}
               </div>
             ) : error ? (
-              <Alert variant="destructive" className="rounded-3xl border-destructive/50 bg-destructive/5">
+              <Alert
+                variant="destructive"
+                className="rounded-3xl border-destructive/50 bg-destructive/5"
+              >
                 <AlertTitle className="text-lg">Connection Error</AlertTitle>
                 <AlertDescription className="mt-2 text-base">
                   <p>{error}</p>
@@ -273,29 +288,41 @@ const Dashboard: React.FC = () => {
                       name: connection.name,
                       username: connection.description,
                       url: connection.url,
-                      icon: connection.icon,
+                      icon: connection.iconName,
+                      updatedAt: connection.updatedAt,
                     }}
                     onEdit={() => setConnectionToEdit(connection)}
                     onDelete={() => handleDeleteClick(connection._id)}
-                    onIconChange={(iconName) => handleIconChange(connection._id, iconName)}
+                    onIconChange={(iconName) =>
+                      handleIconChange(connection._id, iconName)
+                    }
                   />
-
                 ))}
               </div>
             ) : (
               <Empty className="rounded-[2.5rem] border-border/80 bg-card/50 py-16">
                 <EmptyHeader>
-                  <EmptyMedia variant="icon" className="size-20 bg-primary/10 text-primary">
-                    <HugeiconsIcon icon={PlusSignIcon} size={32} strokeWidth={1.5} />
+                  <EmptyMedia
+                    variant="icon"
+                    className="size-20 bg-primary/10 text-primary"
+                  >
+                    <HugeiconsIcon
+                      icon={PlusSignIcon}
+                      size={32}
+                      strokeWidth={1.5}
+                    />
                   </EmptyMedia>
-                  <EmptyTitle className="text-2xl">No links added yet</EmptyTitle>
+                  <EmptyTitle className="text-2xl">
+                    No links added yet
+                  </EmptyTitle>
                   <EmptyDescription className="max-w-xs text-center text-base">
-                    Start building your presence by adding your first important link here.
+                    Start building your presence by adding your first important
+                    link here.
                   </EmptyDescription>
                 </EmptyHeader>
                 <EmptyContent>
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="rounded-2xl px-8 shadow-xl shadow-primary/20"
                     onClick={() => setIsAddDrawerOpen(true)}
                   >
@@ -304,7 +331,6 @@ const Dashboard: React.FC = () => {
                 </EmptyContent>
               </Empty>
             )}
-
           </section>
         </div>
       </div>
@@ -320,18 +346,23 @@ const Dashboard: React.FC = () => {
         onClose={() => setConnectionToEdit(null)}
         onSuccess={(updated) =>
           setConnections((prev) =>
-            prev.map((c) => (c._id === updated._id ? updated : c))
+            prev.map((c) => (c._id === updated._id ? updated : c)),
           )
         }
       />
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent className="rounded-3xl border-border/70 p-6">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl">Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl">
+              Are you absolutely sure?
+            </AlertDialogTitle>
             <AlertDialogDescription className="text-base text-muted-foreground">
-              This action cannot be undone. This will permanently delete your link
-              and remove it from your public profile.
+              This action cannot be undone. This will permanently delete your
+              link and remove it from your public profile.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 gap-3">
@@ -348,7 +379,6 @@ const Dashboard: React.FC = () => {
         </AlertDialogContent>
       </AlertDialog>
     </main>
-
   );
 };
 

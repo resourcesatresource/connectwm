@@ -17,8 +17,11 @@
     "jsx": "react-jsx",
     "baseUrl": "src",
     "paths": {
-      "@hugeicons/core-free-icons": ["../node_modules/@hugeicons/core-free-icons/dist/types/index.d.ts"]
-    }
+      "@hugeicons/core-free-icons": [
+        "../node_modules/@hugeicons/core-free-icons/dist/types/index.d.ts"
+      ]
+    },
+    "types": ["node"]
   },
   "include": ["src"]
 }

@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { getPlatformMeta } from "../utils";
+import { getPlatformMeta, getDomain } from "../utils";
 
 interface CardProps {
   platform: {
@@ -39,7 +39,7 @@ const Card: React.FC<CardProps> = ({ platform }) => {
               <HugeiconsIcon icon={Icon} size={24} strokeWidth={1.8} />
             </div>
             <Badge variant="outline" className="border-border/70 bg-secondary/40">
-              {label}
+              {getDomain(url)}
             </Badge>
           </div>
           <div className="flex flex-col gap-1">
