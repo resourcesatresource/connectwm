@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
-  Menu02Icon,
   UserIcon,
   Link01Icon,
   RefreshIcon,
@@ -29,15 +28,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
 import {
   Empty,
   EmptyContent,
@@ -143,47 +133,35 @@ function Profile() {
           </div>
         )}
         
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
-          <div className="flex-1">
-            <Header />
-          </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="button" variant="outline" className="h-[54px] w-full rounded-full border-border/70 bg-background/80 px-6 shadow-sm backdrop-blur sm:w-auto">
-                <HugeiconsIcon
-                  icon={Menu02Icon}
-                  data-icon="inline-start"
-                  strokeWidth={1.8}
-                />
-                Page Menu
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 mt-2 rounded-2xl border-border/70 shadow-xl">
-              <DropdownMenuLabel className="font-semibold uppercase tracking-wider text-[10px] text-muted-foreground px-3 py-2">
-                Quick actions
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={() => scrollToSection("profile-overview")} className="rounded-xl cursor-pointer mx-1">
-                  <HugeiconsIcon icon={UserIcon} size={16} className="mr-2.5" strokeWidth={1.8} />
-                  Profile overview
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => scrollToSection("social-links")} className="rounded-xl cursor-pointer mx-1">
-                  <HugeiconsIcon icon={Link01Icon} size={16} className="mr-2.5" strokeWidth={1.8} />
-                  Social links
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => fetchConnections(paramId || fallbackCustomerId)}
-                  className="rounded-xl cursor-pointer mx-1"
-                >
-                  <HugeiconsIcon icon={RefreshIcon} size={16} className="mr-2.5" strokeWidth={1.8} />
-                  Refresh profile
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex-1">
+          <Header />
         </div>
+
+        <nav className="sticky top-4 z-10 flex justify-center">
+          <div className="flex items-center gap-1 rounded-full border border-border/70 bg-background/80 px-2 py-1.5 shadow-sm backdrop-blur">
+            <button
+              onClick={() => scrollToSection("profile-overview")}
+              className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <HugeiconsIcon icon={UserIcon} size={14} strokeWidth={2} />
+              Profile
+            </button>
+            <button
+              onClick={() => scrollToSection("social-links")}
+              className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <HugeiconsIcon icon={Link01Icon} size={14} strokeWidth={2} />
+              Links
+            </button>
+            <button
+              onClick={() => fetchConnections(paramId || fallbackCustomerId)}
+              className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <HugeiconsIcon icon={RefreshIcon} size={14} strokeWidth={2} />
+              Refresh
+            </button>
+          </div>
+        </nav>
 
         <Card
           id="profile-overview"
@@ -193,6 +171,7 @@ function Profile() {
             <div className="relative mx-auto flex w-full max-w-[220px] items-center justify-center">
               <div className="absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(circle_at_center,_hsl(var(--primary)),_transparent_70%)] opacity-20 blur-3xl animate-pulse" />
               <Avatar className="relative h-44 w-44 rounded-[2.5rem] shadow-2xl ring-1 ring-border/50 sm:h-52 sm:w-52 overflow-hidden border-4 border-background/50 backdrop-blur-xl">
+                <AvatarImage src={customer?.userId?.profileImage} alt={customer?.name} className="object-cover" />
                 <AvatarFallback className="flex h-full w-full items-center justify-center rounded-[2.5rem] bg-gradient-to-br from-primary via-primary/80 to-accent text-5xl font-bold text-primary-foreground shadow-inner">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_white/20,_transparent_40%)]" />
                   {isLoading ? (
@@ -220,6 +199,18 @@ function Profile() {
                         connectionList.length === 1 ? "link" : "links"
                       }`}
                 </Badge>
+                {customer?.createdAt && (
+                  <Badge
+                    variant="outline"
+                    className="rounded-full border-border/70 bg-background/70 px-4 py-1.5"
+                  >
+                    Joined{" "}
+                    {new Date(customer.createdAt).toLocaleDateString(undefined, {
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </Badge>
+                )}
               </div>
               <CardHeader className="flex flex-col gap-3 p-0">
                 <CardTitle className="text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
@@ -287,7 +278,7 @@ function Profile() {
             <Empty className="rounded-3xl border-border/80 bg-card/70">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <HugeiconsIcon icon={Menu02Icon} strokeWidth={1.8} />
+                  <HugeiconsIcon icon={Link01Icon} strokeWidth={1.8} />
                 </EmptyMedia>
                 <EmptyTitle>No connections yet</EmptyTitle>
                 <EmptyDescription>

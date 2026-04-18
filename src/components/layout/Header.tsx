@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const Header: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -66,6 +66,7 @@ const Header: React.FC = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 rounded-full pl-2 pr-4 gap-2 hover:bg-muted/50">
                 <Avatar className="h-7 w-7 rounded-full border border-border/50">
+                  <AvatarImage src={user?.profileImage} alt={user?.name} className="object-cover" />
                   <AvatarFallback className="bg-primary/10 text-[10px] font-bold text-primary">
                     {user?.name?.slice(0, 1).toUpperCase() || "U"}
                   </AvatarFallback>

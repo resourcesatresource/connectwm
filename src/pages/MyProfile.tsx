@@ -12,11 +12,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Header from "../components/layout/Header";
 import { useProfile } from "../context/ProfileContext";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
-import { Avatar, AvatarFallback } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
 import ProfileEditDrawer from "../components/ProfileEditDrawer";
+import AvatarUpload from "../components/AvatarUpload";
 
 const MyProfile: React.FC = () => {
   const { userProfile: user, isLoading } = useProfile();
@@ -54,11 +54,12 @@ const MyProfile: React.FC = () => {
           <Card className="overflow-hidden border-border/60 bg-card/60 shadow-sm">
             <CardHeader className="border-b border-border/40 bg-muted/20 pb-8 pt-8">
               <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-                <Avatar className="h-24 w-24 rounded-3xl border-4 border-background shadow-xl sm:h-32 sm:w-32">
-                  <AvatarFallback className="bg-primary text-3xl font-bold text-primary-foreground sm:text-4xl">
-                    {user.name.slice(0, 1).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <AvatarUpload
+                  name={user.name}
+                  currentImage={user.profileImage}
+                  avatarClassName="h-24 w-24 rounded-3xl border-4 border-background shadow-xl sm:h-32 sm:w-32"
+                  fallbackClassName="bg-primary text-3xl font-bold text-primary-foreground sm:text-4xl"
+                />
                 
                 <div className="flex flex-1 flex-col items-center gap-4 sm:items-start sm:pt-2">
                   <div className="flex flex-col items-center gap-2 sm:items-start">

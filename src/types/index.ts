@@ -4,6 +4,7 @@ export interface User {
   email: string;
   username?: string;
   isAdmin: boolean;
+  profileImage?: string;
 }
 
 export interface Connection {
@@ -20,6 +21,10 @@ export interface CustomerDetails {
   _id: string;
   name: string;
   isGold: boolean;
-  userId: string;
+  userId: {
+    _id: string;
+    profileImage?: string;
+  };
   connections: Connection[];
+  createdAt: string;
 }

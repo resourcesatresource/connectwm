@@ -34,5 +34,12 @@ export const API = {
         "https://node-api-452537150366.asia-south2.run.app/api/auth",
       ),
     },
+    ME: {
+      DEV: "http://localhost:3000/api/users/me",
+      PROD: url(
+        "http://localhost:3000/api/users/me",
+        "https://node-api-452537150366.asia-south2.run.app/api/users/me",
+      ),
+    },
   },
 };
