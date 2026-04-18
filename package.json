@@ -1,6 +1,6 @@
 {
   "name": "connectwm",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",
