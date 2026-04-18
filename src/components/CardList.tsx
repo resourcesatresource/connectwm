@@ -15,6 +15,7 @@ const CardList: React.FC<CardListProps> = ({ list }) => {
             name: item.name,
             username: item.description,
             url: item.url,
+            iconName: item.iconName,
           };
 
           return (
